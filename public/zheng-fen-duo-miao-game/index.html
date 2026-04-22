@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>争分夺秒 · 模拟刮刮乐</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!--
+      🎯 争分夺秒（模拟刮刮乐）
+      设计目标：模块完全独立、纯原生 HTML/CSS/JS，可直接嵌入任意框架或作为静态页运行。
+
+      结构说明：
+      - ticket-container 内部采用“底层内容 canvas + 顶层刮开涂层 canvas + 粒子 canvas（可选）”的分层方式
+      - 核心刮开使用 destination-out 擦除顶层涂层
+    -->
+    <main class="app">
+      <header class="header">
+        <div class="title">
+          <h1>争分夺秒</h1>
+          <p class="subtitle">模拟刮刮乐：购买 → 刮开 → 自动结算（返奖率约 65%，中奖面约 28%）</p>
+        </div>
+        <div class="hud">
+          <div class="hud-card">
+            <div class="hud-label">余额</div>
+            <div id="balance" class="hud-value">¥0.00</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-label">本张中奖</div>
+            <div id="current-prize" class="hud-value prize">¥0.00</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="stage">
+        <div id="ticket-container" class="ticket-container" aria-label="刮刮乐彩票区域">
+          <!-- 底层：真实票面内容（标准时间 / 你的时间 / 奖金） -->
+          <canvas id="ticket-canvas" width="800" height="400"></canvas>
+          <!-- 顶层：银灰色可刮涂层（监听交互并擦除） -->
+          <canvas id="scratch-canvas" width="800" height="400"></canvas>
+          <!-- 视觉增强：刮擦粒子（不参与擦除，纯表现） -->
+          <canvas id="particle-canvas" width="800" height="400"></canvas>
+        </div>
+
+        <div class="controls">
+          <button id="buy-btn" class="btn primary" type="button">购买一张（2元）</button>
+          <button id="auto-scratch-btn" class="btn" type="button">自动刮开</button>
+          <button id="reset-btn" class="btn ghost" type="button">重置余额（10000）</button>
+        </div>
+
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      </section>
+
+      <footer class="footer">
+        <div class="tip">
+          操作提示：按住鼠标左键在涂层上拖动即可刮开；刮开面积达到 60% 会自动清空涂层并结算。
+        </div>
+      </footer>
+    </main>
+
+    <script src="./main.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+/* =========================================
+   争分夺秒 · 模拟刮刮乐（纯原生）
+   目标：桌面端展示清晰、交互反馈丰富、布局现代。
+   ========================================= */
+
+:root {
+  --bg0: #060817;
+  --bg1: #0b1026;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel2: rgba(255, 255, 255, 0.08);
+  --stroke: rgba(255, 255, 255, 0.12);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(226, 232, 240, 0.78);
+  --amber: #fbbf24;
+  --sky: #60a5fa;
+  --rose: #fb7185;
+  --ok: #34d399;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(96, 165, 250, 0.25), transparent 55%),
+    radial-gradient(800px 420px at 20% 10%, rgba(251, 191, 36, 0.18), transparent 60%),
+    radial-gradient(900px 460px at 80% 35%, rgba(251, 113, 133, 0.14), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 22px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 18px;
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(2, 6, 23, 0.35));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: 0.5px;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 640px;
+  line-height: 1.5;
+}
+
+.hud {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.hud-card {
+  min-width: 160px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.hud-label {
+  font-size: 12px;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.hud-value {
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.hud-value.prize {
+  color: rgba(253, 230, 138, 0.95);
+  text-shadow: 0 0 18px rgba(251, 191, 36, 0.2);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ticket-container {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  aspect-ratio: 2 / 1;
+  margin: 0 auto;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.35), rgba(2, 6, 23, 0.55));
+  box-shadow: 0 30px 120px rgba(0, 0, 0, 0.55);
+}
+
+.ticket-container canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#particle-canvas {
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease;
+  min-width: 160px;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.btn.primary {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.95), rgba(245, 158, 11, 0.95));
+  color: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 18px 48px rgba(251, 191, 36, 0.22);
+}
+
+.btn.ghost {
+  border-color: rgba(96, 165, 250, 0.25);
+  color: rgba(191, 219, 254, 0.95);
+  background: rgba(96, 165, 250, 0.06);
+}
+
+.toast {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  min-height: 22px;
+  text-align: center;
+  color: rgba(226, 232, 240, 0.88);
+  font-size: 13px;
+}
+
+.toast strong {
+  color: rgba(253, 230, 138, 0.95);
+}
+
+.footer {
+  padding: 10px 4px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.tip {
+  max-width: 980px;
+  width: 100%;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  padding: 12px 14px;
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 12px;
+  line-height: 1.55;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 860px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hud {
+    justify-content: flex-start;
+  }
+  .hud-card {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
